@@ -1,26 +1,8 @@
-# VASP Flexibility Engine - 460K checks/sec + Pluggable Policies 🔌
+# VASP Flexibility Engine - 460K checks/sec + Pluggable Policies
 
-Extensible VASP compliance engine - Function pointer architecture.
+![Architecture](https://raw.githubusercontent.com/nsmanju/vasp-flexibility-engine/main/docs/architecture.png)
 
 ## Benchmark
-| Metric | Value |
-|--------|-------|
-| Throughput | **460,163 checks/sec** |
-| Architecture | Function pointer `RiskPolicy` |
-| Blacklist | 5,000 entries |
-| Policies | `default_policy`, `strict_policy` (extensible) |
-| Compliance | SFC Travel Rule HKD 8000 |
-| Language | C++17 + pybind11 Python bindings |
+460K checks/sec, Function pointer RiskPolicy, SFC Travel Rule HKD 8000
 
-## Why Flexibility?
-
-```cpp
-// Runtime policy injection
-screener.set_policy(Screener::strict_policy);
-
-// Add your own custom policies
-bool my_custom_policy(const std::string& wallet, const auto& blacklist) {
-    // Custom KYC/PEP logic
-    return blacklist.find(wallet) != blacklist.end();
-}
-screener.set_policy(my_custom_policy);
+See: https://github.com/nsmanju/vasp-performance-engine
