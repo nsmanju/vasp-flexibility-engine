@@ -1,18 +1,18 @@
-// Python binding using pybind11 - Bridge between C++ speed and Python ease
 #include <pybind11/pybind11.h>
 #include "screener.h"
 
-namespace py = pybind11; // Shortcut
+namespace py = pybind11;
 
-// This creates a Python module named 'vasp_core'
-// When you do 'import vasp_core' in Python, this code runs
 PYBIND11_MODULE(vasp_core, m) {
-  m.doc() = "High-performance VASP screening engine (SFC compliant)"; // Module description
-  
-  // Expose C++ class Screener to Python
-  py::class_<Screener>(m, "Screener")
-    .def(py::init<>()) // Allow Python to create Screener() objects
-    .def("load_blacklist", &Screener::load_blacklist, "Load blacklisted wallets from file")
-    .def("is_risky", &Screener::is_risky, "Check if wallet is risky")
-    .def("needs_travel_rule", &Screener::needs_travel_rule, "Check if SFC Travel Rule applies (>= HKD 8000)");
+    m.doc() = "VASP Screener Core - O(1) Flexibility Engine";
+    
+    py::class_<Screener>(m, "Screener")
+        .def(py::init<>())
+        .def("load_blacklist", &Screener::load_blacklist)
+        .def("is_risky", &Screener::is_risky)
+        .def("needs_travel_rule", &Screener::needs_travel_rule)
+        .def("blacklist_size", &Screener::blacklist_size)
+        .def("set_policy", &Screener::set_policy)
+        .def_static("default_policy", &Screener::default_policy)
+        .def_static("strict_policy", &Screener::strict_policy);
 }

@@ -1,28 +1,40 @@
-// Implementation of VASP Screener - Optimized for speed
 #include "screener.h"
-#include <fstream> // For reading blacklist files
+#include <fstream>
+#include <algorithm>
+#include <cctype>
 
-// Load blacklist from text file, one wallet per line
-void Screener::load_blacklist(const std::string& path) {
-  std::ifstream f(path); // Open file
-  std::string line;
-  // Read line by line, skip empty lines
-  while (std::getline(f, line)) {
-    if(!line.empty()) {
-      blacklist.insert(line); // Insert into hash table - O(1)
+Screener::Screener() : current_policy(default_policy) {}
+
+bool Screener::load_blacklist(const std::string& file_path) {
+    std::ifstream file(file_path);
+    if (!file.is_open()) return false;
+    std::string wallet;
+    while (std::getline(file, wallet)) {
+        if (wallet.empty()) continue;
+        blacklist.insert(wallet);
     }
-  }
+    return true;
 }
 
-// Risk check: Is this wallet in our blacklist?
-// Complexity: O(1) average - critical for high-frequency trading
-bool Screener::is_risky(const std::string& w) { 
-  return blacklist.count(w); // count = 1 if exists, 0 if not
+bool Screener::is_risky(const std::string& wallet) const {
+    return current_policy(wallet, blacklist);
 }
 
-// SFC Travel Rule compliance check
-// Hong Kong SFC requires Travel Rule for virtual asset transfers >= HKD 8000
-// Equivalent to FATF Recommendation 16
-bool Screener::needs_travel_rule(double amt) { 
-  return amt >= 8000.0; // Threshold defined by SFC
+void Screener::set_policy(RiskPolicy policy) {
+    current_policy = policy;
+}
+
+bool Screener::default_policy(const std::string& wallet, const std::unordered_set<std::string>& blacklist) {
+    return blacklist.find(wallet) != blacklist.end();
+}
+
+bool Screener::strict_policy(const std::string& wallet, const std::unordered_set<std::string>& blacklist) {
+    std::string lower = wallet;
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+    for (const auto& entry : blacklist) {
+        std::string e = entry;
+        std::transform(e.begin(), e.end(), e.begin(), ::tolower);
+        if (lower.find(e) != std::string::npos || e.find(lower) != std::string::npos) return true;
+    }
+    return blacklist.find(wallet) != blacklist.end();
 }
