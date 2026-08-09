@@ -2,7 +2,7 @@
 
 Pluggable compliance architecture for Hong Kong SFC Travel Rule.
 
-![Architecture Comparison](../docs/architecture.png)
+![Architecture Comparison](docs/architecture.png)
 
 ## Architecture Tradeoff
 
